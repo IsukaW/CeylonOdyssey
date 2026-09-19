@@ -1,0 +1,37 @@
+/* App Layout & Keyframe Refinements */
+.hero-gradient {
+  background: radial-gradient(circle at 50% 20%, rgba(15, 61, 46, 0.4) 0%, transparent 70%);
+}
+
+@keyframes spinSlow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spinSlow 30s linear infinite;
+}
+
+/* Glass panel glow utilities */
+.glass-glow-gold {
+  box-shadow: 0 0 35px -5px rgba(244, 185, 66, 0.25);
+}
+
+.glass-glow-teal {
+  box-shadow: 0 0 35px -5px rgba(14, 124, 134, 0.25);
+}
+
+/* Monograph print framing style */
+.monograph-frame {
+  box-shadow: inset 0 0 0 1px rgba(246, 235, 217, 0.15);
+}
+
+/* Subtle gold horizontal divider */
+.divider-gold {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(244, 185, 66, 0.3), transparent);
+}
