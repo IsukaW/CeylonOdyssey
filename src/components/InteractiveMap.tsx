@@ -17,14 +17,26 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
 
   const activeDestination = DESTINATIONS.find((d) => d.id === activeId) || DESTINATIONS[0];
 
-  // SVG coordinates tuned for Sri Lanka teardrop map projection [viewBox="0 0 500 700"]
+  // Short map-pin labels — some destination names lead with a descriptor
+  // ("Sacred Kandy…") rather than the place name, so derive labels from id.
+  const pinLabels: Record<string, string> = {
+    sigiriya: 'Sigiriya',
+    dambulla: 'Dambulla',
+    kandy: 'Kandy',
+    kitulgala: 'Kitulgala',
+    ella: 'Ella',
+    galle: 'Galle',
+  };
+
+  // Real waypoint positions, equirectangular-projected from actual lat/lng
+  // (see DESTINATIONS) onto the island silhouette below [viewBox="0 0 452 769"]
   const waypointPositions: Record<string, { x: number; y: number }> = {
-    sigiriya: { x: 255, y: 220 },
-    dambulla: { x: 235, y: 250 },
-    kandy: { x: 245, y: 340 },
-    kitulgala: { x: 200, y: 395 },
-    ella: { x: 285, y: 440 },
-    galle: { x: 190, y: 550 },
+    sigiriya: { x: 221.3, y: 369.8 },
+    dambulla: { x: 201.3, y: 384.9 },
+    kandy: { x: 198.2, y: 491.7 },
+    kitulgala: { x: 158.1, y: 546.0 },
+    ella: { x: 273.7, y: 569.2 },
+    galle: { x: 122.7, y: 718.0 },
   };
 
   return (
@@ -68,7 +80,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
         <div className="lg:col-span-6 flex justify-center">
           <div className="relative w-full max-w-[480px] p-6 rounded-3xl bg-[#1b1b1b]/60 border border-[#f6ebd9]/15 backdrop-blur-xl shadow-2xl overflow-hidden">
             {/* Ambient Background Glow for Central Highlands */}
-            <div className="absolute top-[45%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[radial-gradient(circle,rgba(15,61,46,0.6)_0%,transparent_70%)] pointer-events-none" />
+            <div className="absolute top-[64%] left-[46%] -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[radial-gradient(circle,rgba(15,61,46,0.6)_0%,transparent_70%)] pointer-events-none" />
 
             {/* Map Compass Rose */}
             <div className="absolute top-6 right-6 flex flex-col items-center opacity-70 pointer-events-none">
@@ -83,9 +95,9 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
               <div className="text-[#0e7c86] font-sans text-[9px] uppercase tracking-wider">Indian Ocean Waters</div>
             </div>
 
-            {/* SVG Map of Sri Lanka */}
+            {/* SVG Map of Sri Lanka — real coastline, geo-projected from OpenStreetMap boundary data */}
             <svg
-              viewBox="0 0 500 700"
+              viewBox="0 0 452 769"
               className="w-full h-auto drop-shadow-[0_15px_25px_rgba(0,0,0,0.7)]"
             >
               <defs>
@@ -110,39 +122,31 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
                 </filter>
               </defs>
 
-              {/* Realistic Stylized Sri Lanka Island Silhouette */}
+              {/* Offshore islets (Mannar & the Jaffna island cluster) */}
+              <g fill="#175a41" stroke="rgba(244, 185, 66, 0.35)" strokeWidth="0.6">
+                <circle cx="48.5" cy="170.4" r="12.3" />
+                <circle cx="69.6" cy="60.3" r="8.5" />
+                <circle cx="51.2" cy="69.0" r="3.1" />
+                <circle cx="24.8" cy="82.8" r="4.1" />
+                <circle cx="80.1" cy="125.9" r="1.8" />
+                <circle cx="60.4" cy="43.6" r="3.2" />
+              </g>
+
+              {/* Real Sri Lanka Island Silhouette (OpenStreetMap coastline, simplified) */}
               <path
-                d="M 230 45 
-                   C 255 45, 275 60, 270 95
-                   C 265 125, 290 145, 305 175
-                   C 325 215, 335 260, 330 310
-                   C 325 365, 345 405, 340 455
-                   C 335 505, 310 550, 280 585
-                   C 255 615, 220 630, 195 620
-                   C 170 610, 160 575, 165 540
-                   C 170 500, 185 455, 180 405
-                   C 175 355, 190 310, 195 260
-                   C 200 205, 190 160, 205 110
-                   C 215 75, 215 45, 230 45 Z"
+                d="M 121.0 26.0 C 88.0 8.6 72.3 31.3 65.2 38.1 C 58.2 45.0 75.0 53.1 85.8 60.0 C 96.5 66.9 113.1 72.9 118.8 72.7 C 124.4 72.5 106.5 56.7 114.1 59.0 C 121.6 61.4 151.6 76.8 156.5 84.6 C 161.3 92.4 145.1 98.7 138.4 98.0 C 131.7 97.4 132.5 86.9 123.2 81.1 C 113.8 75.4 93.1 67.5 91.7 69.3 C 90.3 71.1 116.2 82.4 116.2 90.1 C 116.3 97.7 94.3 100.8 92.0 107.6 C 89.7 114.5 104.9 111.3 104.7 124.5 C 104.5 137.7 98.8 160.3 91.1 173.5 C 83.4 186.6 69.2 178.9 66.0 190.1 C 62.7 201.3 79.3 203.6 74.9 229.4 C 70.4 255.2 48.3 298.2 43.7 319.1 C 39.1 340.1 51.9 328.3 51.9 334.1 C 51.9 339.9 44.0 339.6 43.7 348.1 C 43.4 356.5 49.0 373.0 50.3 376.5 C 51.5 380.0 53.0 369.1 49.8 365.6 C 46.5 362.2 37.5 364.6 34.0 359.3 C 30.5 354.1 30.5 352.9 32.3 339.4 C 34.1 325.9 44.3 294.8 43.1 291.6 C 41.8 288.4 28.9 311.4 26.0 323.3 C 23.1 335.3 21.8 311.3 28.4 351.5 C 35.1 391.6 55.2 492.8 59.2 524.0 C 63.3 555.2 48.9 502.7 48.7 507.6 C 48.6 512.6 58.3 539.3 58.5 548.8 C 58.7 558.3 42.7 526.1 49.8 554.9 C 56.8 583.8 78.3 658.5 93.7 692.9 C 109.1 727.3 107.4 716.9 126.7 726.8 C 146.0 736.8 150.9 749.7 190.4 742.6 C 230.0 735.5 284.2 712.2 324.5 691.4 C 364.8 670.7 373.6 659.5 392.0 638.8 C 410.4 618.1 409.5 607.6 416.3 588.0 C 423.1 568.4 424.5 561.3 426.0 540.8 C 427.5 520.3 428.1 508.9 423.6 485.5 C 419.1 462.1 413.9 442.8 403.5 423.8 C 393.1 404.7 377.9 399.7 371.5 390.2 C 365.2 380.8 374.3 379.0 371.8 376.4 C 369.3 373.9 360.1 380.2 359.0 377.7 C 357.9 375.2 367.9 368.7 366.4 364.0 C 364.9 359.3 359.0 372.7 351.7 354.1 C 344.4 335.5 335.4 288.6 329.7 271.0 C 324.0 253.3 327.4 264.3 323.2 265.8 C 319.0 267.4 315.7 277.7 308.7 278.8 C 301.7 279.9 291.2 274.4 288.2 271.1 C 285.2 267.8 290.3 262.6 293.5 262.1 C 296.7 261.7 302.5 270.0 304.1 268.7 C 305.8 267.5 300.7 257.2 301.8 255.9 C 303.0 254.6 309.1 265.0 310.0 262.3 C 310.9 259.6 316.5 258.4 306.4 242.4 C 296.3 226.3 269.7 192.1 259.4 182.0 C 249.2 171.8 257.5 190.3 255.2 191.6 C 252.9 192.9 249.8 192.7 247.9 188.4 C 245.9 184.2 243.3 171.8 245.4 170.3 C 247.6 168.7 261.6 189.8 258.7 180.9 C 255.7 171.9 258.1 156.3 230.6 125.3 C 203.0 94.3 154.1 43.4 121.0 26.0 Z"
                 fill="url(#slIslandGrad)"
-                stroke="rgba(244, 185, 66, 0.4)"
+                stroke="rgba(244, 185, 66, 0.45)"
                 strokeWidth="1.5"
+                strokeLinejoin="round"
               />
 
-              {/* Jaffna Peninsula stylized extension in the north */}
-              <path
-                d="M 215 80 C 190 60, 180 30, 200 20 C 220 10, 240 25, 230 45 Z"
-                fill="url(#slIslandGrad)"
-                stroke="rgba(244, 185, 66, 0.3)"
-                strokeWidth="1"
-              />
-
-              {/* Central Highlands Elevation Shading */}
+              {/* Central Highlands Elevation Shading (tea country around Nuwara Eliya) */}
               <ellipse
-                cx="245"
-                cy="375"
-                rx="70"
-                ry="90"
+                cx="222"
+                cy="500"
+                rx="66"
+                ry="98"
                 fill="url(#highlandRelief)"
               />
 
@@ -150,7 +154,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
               {/* Circuit 1: The Royal Route (Sigiriya - Dambulla - Kandy) */}
               {(activeCircuit === 'all' || activeCircuit === 'royal') && (
                 <path
-                  d="M 255 220 L 235 250 L 245 340"
+                  d="M 221.3 369.8 L 201.3 384.9 L 198.2 491.7"
                   fill="none"
                   stroke="#f4b942"
                   strokeWidth="2"
@@ -163,7 +167,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
               {/* Circuit 2: Highland Tea Route (Kandy - Kitulgala - Ella) */}
               {(activeCircuit === 'all' || activeCircuit === 'tea') && (
                 <path
-                  d="M 245 340 L 200 395 L 285 440"
+                  d="M 198.2 491.7 L 158.1 546.0 L 273.7 569.2"
                   fill="none"
                   stroke="#7cd4df"
                   strokeWidth="2"
@@ -171,10 +175,10 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
                 />
               )}
 
-              {/* Circuit 3: Southern Coast Circuit (Ella - Galle) */}
+              {/* Circuit 3: Southern Coast Circuit (Ella - Tangalle - Galle) */}
               {(activeCircuit === 'all' || activeCircuit === 'coast') && (
                 <path
-                  d="M 285 440 L 250 510 L 190 550"
+                  d="M 273.7 569.2 L 227.4 723.3 L 122.7 718.0"
                   fill="none"
                   stroke="#f4b942"
                   strokeWidth="2"
@@ -183,8 +187,8 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
               )}
 
               {/* Colombo gateway indicator */}
-              <circle cx="175" cy="425" r="3.5" fill="#c0c8c3" opacity="0.6" />
-              <text x="125" y="430" fill="#c0c8c3" fontSize="10" fontFamily="sans-serif">
+              <circle cx="56.8" cy="558.2" r="3.5" fill="#c0c8c3" opacity="0.6" />
+              <text x="12" y="573" fill="#c0c8c3" fontSize="10" fontFamily="sans-serif">
                 Colombo (CMB)
               </text>
 
@@ -242,7 +246,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
                       fontFamily="var(--font-serif)"
                       className="transition-all duration-300 pointer-events-none drop-shadow-md"
                     >
-                      {wp.name.split(' ')[0]}
+                      {pinLabels[wp.id] || wp.name.split(' ')[0]}
                     </text>
                   </g>
                 );
